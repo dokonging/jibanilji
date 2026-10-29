@@ -16,6 +16,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -309,41 +310,62 @@ class EditActivity : AppCompatActivity() {
         findViewById<View>(R.id.plus).setOnClickListener { step(1) }
     }
 
-    // ---------- 아이콘 (카테고리별) ----------
+    // ---------- 아이콘: 종류별 대표 하나씩, 누르면 팝업에서 고르기 ----------
     private fun buildIconGrid() {
         iconGrid.removeAllViews()
-        val cols = iconGrid.columnCount
+        iconGrid.columnCount = 4
         for ((group, icons) in Thumb.groups(kind)) {
-            iconGrid.addView(TextView(this).apply {
-                text = group; textSize = 12f; setTypeface(typeface, Typeface.BOLD)
-                setTextColor(getColor(R.color.muted))
-                setPadding(dp(4), dp(10), 0, dp(2))
-                layoutParams = GridLayout.LayoutParams(
-                    GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(0, cols, 1f)
-                ).apply { width = 0 }
-            })
-            icons.forEach { ic ->
-                iconGrid.addView(TextView(this).apply {
-                    text = ic; textSize = 24f; gravity = Gravity.CENTER; tag = ic
-                    contentDescription = "$group 아이콘"
-                    layoutParams = GridLayout.LayoutParams(
-                        GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                    ).apply { width = 0; height = dp(50); setMargins(3, 3, 3, 3) }
-                    setOnClickListener { icon = ic; refreshIconSelection() }
+            iconGrid.addView(LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER
+                setPadding(0, dp(8), 0, dp(6)); tag = group
+                contentDescription = "$group 아이콘 고르기"
+                addView(TextView(context).apply { textSize = 24f; gravity = Gravity.CENTER })
+                addView(TextView(context).apply {
+                    text = group; textSize = 11f; gravity = Gravity.CENTER; maxLines = 1
+                    setTextColor(c(R.color.muted))
                 })
-            }
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                ).apply { width = 0; setMargins(dp(3), dp(3), dp(3), dp(3)) }
+                setOnClickListener { pickIcon(group, icons) }
+            })
         }
         refreshIconSelection()
     }
 
+    /** 고른 아이콘이 속한 종류는 그 아이콘을 보여주고 강조, 나머지는 대표 아이콘 */
     private fun refreshIconSelection() {
+        val groups = Thumb.groups(kind).toMap()
         for (i in 0 until iconGrid.childCount) {
-            val v = iconGrid.getChildAt(i)
-            if (v.tag == null) continue // 카테고리 제목
-            val on = v.tag == icon
-            v.background = if (on) Thumb.bg(this, Thumb.colorFor(kind, icon)) else null
-            v.alpha = if (on) 1f else 0.75f
+            val box = iconGrid.getChildAt(i) as LinearLayout
+            val icons = (box.tag as? String)?.let { groups[it] } ?: continue
+            val on = icon in icons
+            (box.getChildAt(0) as TextView).text = if (on) icon else icons.first()
+            (box.getChildAt(1) as TextView).setTextColor(c(if (on) R.color.brand else R.color.muted))
+            box.background = if (on) Thumb.bg(this, Thumb.colorFor(kind, icon))
+                else rounded(c(R.color.surface2), 12)
+            box.alpha = if (on) 1f else 0.85f
         }
+    }
+
+    private fun pickIcon(group: String, icons: List<String>) {
+        val grid = GridLayout(this).apply {
+            columnCount = 5
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+        }
+        lateinit var dlg: AlertDialog
+        icons.forEach { ic ->
+            grid.addView(TextView(this).apply {
+                text = ic; textSize = 28f; gravity = Gravity.CENTER
+                if (ic == icon) background = rounded(c(R.color.brand_soft), 14)
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                ).apply { width = 0; height = dp(56) }
+                setOnClickListener { icon = ic; refreshIconSelection(); dlg.dismiss() }
+            })
+        }
+        dlg = AlertDialog.Builder(this).setTitle(group).setView(grid)
+            .setNegativeButton("닫기", null).show()
     }
 
     private fun applyMode() {
