@@ -37,11 +37,21 @@ jobs:
 
       - name: Build APK
         run: |
-          set -o pipefail
-          if ! gradle assembleRelease --no-daemon --console=plain 2>&1 | tee build.log; then
-            # 오류 줄만 모아서 Actions 화면 요약에 표시
-            msg=$(grep -E "^e: |^w: .*error|What went wrong|^> |error:|Exception|not found|Could not" build.log | head -60 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
-            echo "::error title=Build failed::${msg}"
+          set +e
+          gradle assembleRelease --no-daemon --console=plain > build.log 2>&1
+          code=$?
+          tail -n 80 build.log
+          if [ $code -ne 0 ]; then
+            # 실패하면 전체 로그를 build-log 브랜치에 저장 (원인 확인용)
+            git config user.name "build-bot"
+            git config user.email "build-bot@users.noreply.github.com"
+            cp build.log /tmp/build.log
+            git checkout -q --orphan build-log
+            git rm -rq --cached . > /dev/null
+            cp /tmp/build.log build.log
+            git add -f build.log
+            git commit -qm "build log ${{ github.run_number }}"
+            git push -qf origin build-log
             exit 1
           fi
 
