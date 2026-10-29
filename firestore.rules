@@ -1,0 +1,49 @@
+rules_version = '2';
+// Firebase 콘솔 > Firestore Database > 규칙(Rules) 탭에 이 내용을 통째로 붙여넣고 "게시"
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMember(hid) {
+      return signedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/households/$(hid)).data.members;
+    }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    // 내 정보는 나만
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // 초대 코드: 로그인한 사람은 조회, 생성·삭제는 그 집 구성원만
+    match /invites/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.auth.uid in
+        getAfter(/databases/$(database)/documents/households/$(request.resource.data.hid)).data.members;
+      allow delete: if isMember(resource.data.hid);
+    }
+
+    match /households/{hid} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+      allow create: if signedIn() && request.resource.data.members == [request.auth.uid]
+        && !('premium' in request.resource.data);
+      allow update: if signedIn() && !changed().hasAny(['premium']) && (
+        // 구성원은 수정 가능 (프리미엄 값은 결제 확인 서버만 변경)
+        request.auth.uid in resource.data.members ||
+        // 구성원이 아니면 "자기 자신 추가"만 가능 (초대 코드로 참여)
+        (changed().hasOnly(['members', 'names']) &&
+         request.resource.data.members.toSet() ==
+           resource.data.members.toSet().union([request.auth.uid].toSet()))
+      );
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+
+      // 식품 · 집안일 항목과 완료 기록: 구성원만
+      match /items/{id} {
+        allow read, write: if isMember(hid);
+        match /logs/{log} {
+          allow read, write: if isMember(hid);
+        }
+      }
+    }
+  }
+}
