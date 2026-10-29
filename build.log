@@ -1,0 +1,218 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:mergeReleaseNativeLibs
+> Task :app:buildKotlinToolingMetadata
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:checkReleaseDuplicateClasses
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libmlkit_google_ocr_pipeline.so.
+
+> Task :app:checkReleaseAarMetadata
+> Task :app:generateReleaseResValues
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:processReleaseGoogleServices
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:mergeReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :app:parseReleaseLocalResources
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :app:javaPreCompileRelease
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeReleaseArtProfile
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:mergeReleaseAssets
+> Task :app:extractReleaseVersionControlInfo
+> Task :app:compressReleaseAssets
+> Task :app:collectReleaseDependencies
+> Task :app:sdkReleaseDependencyData
+> Task :app:validateSigningRelease
+> Task :app:writeReleaseAppMetadata
+> Task :app:writeReleaseSigningConfigVersions
+> Task :app:processReleaseResources
+> Task :app:optimizeReleaseResources
+> Task :app:mergeExtDexRelease
+
+> Task :app:compileReleaseKotlin
+e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+    1. Kotlin compile daemon is ready
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:66:18 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:107:35 Unresolved reference 'date까지'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:146:19 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:147:13 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:149:30 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:149:36 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:149:36 Argument type mismatch: actual type is 'kotlin.text.MatchGroup?', but 'com.google.android.gms.tasks.Task<TResult!>' was expected.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:150:30 Unresolved reference 'documents'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:150:56 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Alarms.kt:150:63 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:82:15 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:84:30 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:84:30 Argument type mismatch: actual type is 'kotlin.text.MatchGroup?', but 'com.jibanilji.app.Item?' was expected.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:199:60 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:256:23 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:256:53 Unresolved reference 'value'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:256:55 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:257:42 Overload resolution ambiguity between candidates:
+fun <R, T> Result<T>.map(transform: (@ParameterName(...) T) -> R): Result<R>
+    [R|Contract description]
+     <
+        CallsInPlace(transform, AT_MOST_ONCE)
+    >
+fun <T, R> Array<out T>.map(transform: (T) -> R): List<R>
+fun <R> BooleanArray.map(transform: (Boolean) -> R): List<R>
+fun <R> ByteArray.map(transform: (Byte) -> R): List<R>
+fun <R> CharArray.map(transform: (Char) -> R): List<R>
+fun <R> DoubleArray.map(transform: (Double) -> R): List<R>
+fun <R> FloatArray.map(transform: (Float) -> R): List<R>
+fun <R> IntArray.map(transform: (Int) -> R): List<R>
+fun <R> LongArray.map(transform: (Long) -> R): List<R>
+fun <R> ShortArray.map(transform: (Short) -> R): List<R>
+fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R>
+fun <K, V, R> Map<out K, V>.map(transform: (Map.Entry<K, V>) -> R): List<R>
+fun <R> UByteArray.map(transform: (UByte) -> R): List<R>
+fun <R> UIntArray.map(transform: (UInt) -> R): List<R>
+fun <R> ULongArray.map(transform: (ULong) -> R): List<R>
+fun <R> UShortArray.map(transform: (UShort) -> R): List<R>
+fun <T, R> Sequence<T>.map(transform: (T) -> R): Sequence<R>
+fun <R> CharSequence.map(transform: (Char) -> R): List<R>
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:257:46 Unresolved reference 'key'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:257:48 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:258:53 Overload resolution ambiguity between candidates:
+fun <R, T> Result<T>.map(transform: (@ParameterName(...) T) -> R): Result<R>
+    [R|Contract description]
+     <
+        CallsInPlace(transform, AT_MOST_ONCE)
+    >
+fun <T, R> Array<out T>.map(transform: (T) -> R): List<R>
+fun <R> BooleanArray.map(transform: (Boolean) -> R): List<R>
+fun <R> ByteArray.map(transform: (Byte) -> R): List<R>
+fun <R> CharArray.map(transform: (Char) -> R): List<R>
+fun <R> DoubleArray.map(transform: (Double) -> R): List<R>
+fun <R> FloatArray.map(transform: (Float) -> R): List<R>
+fun <R> IntArray.map(transform: (Int) -> R): List<R>
+fun <R> LongArray.map(transform: (Long) -> R): List<R>
+fun <R> ShortArray.map(transform: (Short) -> R): List<R>
+fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R>
+fun <K, V, R> Map<out K, V>.map(transform: (Map.Entry<K, V>) -> R): List<R>
+fun <R> UByteArray.map(transform: (UByte) -> R): List<R>
+fun <R> UIntArray.map(transform: (UInt) -> R): List<R>
+fun <R> ULongArray.map(transform: (ULong) -> R): List<R>
+fun <R> UShortArray.map(transform: (UShort) -> R): List<R>
+fun <T, R> Sequence<T>.map(transform: (T) -> R): Sequence<R>
+fun <R> CharSequence.map(transform: (Char) -> R): List<R>
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:258:57 Unresolved reference 'value'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:258:59 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:270:9 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:270:30 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:271:32 Overload resolution ambiguity between candidates:
+fun <T> Array<out T>.isEmpty(): Boolean
+fun BooleanArray.isEmpty(): Boolean
+fun ByteArray.isEmpty(): Boolean
+fun CharArray.isEmpty(): Boolean
+fun DoubleArray.isEmpty(): Boolean
+fun FloatArray.isEmpty(): Boolean
+fun IntArray.isEmpty(): Boolean
+fun LongArray.isEmpty(): Boolean
+fun ShortArray.isEmpty(): Boolean
+fun CharSequence.isEmpty(): Boolean
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:272:23 Overload resolution ambiguity between candidates:
+fun <T> Array<out T>.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((T) -> CharSequence)? = ...): String
+fun BooleanArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Boolean) -> CharSequence)? = ...): String
+fun ByteArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Byte) -> CharSequence)? = ...): String
+fun CharArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Char) -> CharSequence)? = ...): String
+fun DoubleArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Double) -> CharSequence)? = ...): String
+fun FloatArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Float) -> CharSequence)? = ...): String
+fun IntArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Int) -> CharSequence)? = ...): String
+fun LongArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Long) -> CharSequence)? = ...): String
+fun ShortArray.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((Short) -> CharSequence)? = ...): String
+fun <T> Iterable<T>.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((T) -> CharSequence)? = ...): String
+fun <T> Sequence<T>.joinToString(separator: CharSequence = ..., prefix: CharSequence = ..., postfix: CharSequence = ..., limit: Int = ..., truncated: CharSequence = ..., transform: ((T) -> CharSequence)? = ...): String
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:273:46 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:274:27 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:436:49 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:446:51 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:459:46 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:459:64 Unresolved reference 'orEmpty'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/EditActivity.kt:461:9 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:48:21 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:50:88 Unresolved reference 'it'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:72:9 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:72:44 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:72:49 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/LoginActivity.kt:74:66 Return type mismatch: expected 'ERROR CLASS: Cannot infer type variable TypeVariable(_L)', actual 'kotlin.Unit'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:52:13 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:93:13 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:94:17 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:96:13 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:96:48 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:96:53 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:97:42 Assignment type mismatch: actual type is 'kotlin.Any', but 'kotlin.String?' was expected.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:101:48 Assignment type mismatch: actual type is 'kotlin.Any', but 'kotlin.String?' was expected.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:117:42 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:120:32 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:120:49 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:203:9 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:268:17 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:271:61 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/MainActivity.kt:282:48 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Repo.kt:222:1 Syntax error: Unclosed comment.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Routines.kt:114:21 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/Routines.kt:121:76 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:22:19 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:53:43 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:64:13 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:64:54 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:64:58 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:70:21 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:70:42 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:74:21 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:84:21 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:84:48 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:84:52 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:86:35 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:97:9 Unresolved reference 'Repo'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:97:31 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:98:61 Return type mismatch: expected 'ERROR CLASS: Cannot infer type variable TypeVariable(_L)', actual 'kotlin.Unit'.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:99:26 No 'get' operator method providing array access.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:100:21 No 'get' operator method providing array access.
+e: file:///home/runner/work/jibanilji/jibanilji/app/src/main/java/com/jibanilji/app/ShareActivity.kt:102:27 No 'get' operator method providing array access.
+
+> Task :app:compileReleaseKotlin FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1793283533299.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/jibanilji/jibanilji/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 27s
+36 actionable tasks: 36 executed
