@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 라이트: 따뜻한 미색 배경 + 세이지 그린 -->
+    <color name="bg">#F7F4EE</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface2">#EFEBE3</color>
+    <color name="line">#E6E1D7</color>
+    <color name="text">#1E1F1C</color>
+    <color name="muted">#77736B</color>
+    <color name="brand">#3A7D5C</color>
+    <color name="on_brand">#FFFFFF</color>
+    <color name="brand_soft">#E2EFE7</color>
+    <color name="danger">#D14B3F</color>
+    <color name="danger_soft">#FBE7E4</color>
+    <color name="warn">#B86E0E</color>
+    <color name="warn_soft">#FCEFD9</color>
+    <color name="photo_bg">#EFEBE3</color>
+    <bool name="light_bars">true</bool>
+</resources>

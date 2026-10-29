@@ -80,8 +80,9 @@ object Repo {
     }
 
     /** 가구 정보 실시간: 구성원 이름 · 프리미엄 여부 */
-    fun listenHousehold(hid: String, cb: (Map<String, Any?>) -> Unit): ListenerRegistration =
-        householdRef(hid).addSnapshotListener { snap, _ ->
+    fun listenHousehold(hid: String, onError: (String) -> Unit = {}, cb: (Map<String, Any?>) -> Unit): ListenerRegistration =
+        householdRef(hid).addSnapshotListener { snap, e ->
+            if (e != null) onError(explain(e))
             val data = snap?.data ?: return@addSnapshotListener
             members = (data["names"] as? Map<*, *>)?.entries
                 ?.associate { it.key.toString() to it.value.toString() } ?: emptyMap()
@@ -124,8 +125,9 @@ object Repo {
         householdRef(hid).update(mapOf("members" to FieldValue.arrayRemove(uid), "names.$uid" to FieldValue.delete()))
 
     // ---------- 항목 ----------
-    fun listen(hid: String, cb: (List<Item>) -> Unit): ListenerRegistration =
-        itemsRef(hid).addSnapshotListener { snap, _ ->
+    fun listen(hid: String, onError: (String) -> Unit = {}, cb: (List<Item>) -> Unit): ListenerRegistration =
+        itemsRef(hid).addSnapshotListener { snap, e ->
+            if (e != null) { onError(explain(e)); return@addSnapshotListener }
             if (snap == null) return@addSnapshotListener
             val items = snap.documents.map { Item.from(it.id, it.data ?: emptyMap()) }
             latest = items.associateBy { it.id }
@@ -133,10 +135,29 @@ object Repo {
         }
 
     /** 오프라인이어도 바로 반영되고, 연결되면 자동 업로드 */
-    fun save(hid: String, item: Item) {
+    fun save(hid: String, item: Item, ctx: Context? = null) {
         val ref = if (item.id.isEmpty()) itemsRef(hid).document() else itemsRef(hid).document(item.id)
         item.id = ref.id
-        ref.set(item.toMap())
+        val app = ctx?.applicationContext
+        ref.set(item.toMap()).addOnFailureListener { e ->
+            app?.toast("저장하지 못했어요: ${explain(e)}")
+            lastError = explain(e)
+        }
+    }
+
+    /** 마지막으로 난 오류 (설정 > 동기화 상태에 표시) */
+    var lastError: String? = null
+
+    fun explain(e: Exception): String {
+        val code = (e as? com.google.firebase.firestore.FirebaseFirestoreException)?.code?.name
+        return when (code) {
+            "PERMISSION_DENIED" -> "권한 없음 (Firestore 규칙을 확인해 주세요)"
+            "NOT_FOUND" -> "데이터베이스를 찾지 못했어요 (Firestore를 만들었는지 확인)"
+            "UNAVAILABLE" -> "인터넷 연결이 불안정해요"
+            "FAILED_PRECONDITION" -> "Firestore 설정이 완료되지 않았어요"
+            null -> e.message ?: "알 수 없는 오류"
+            else -> "$code: ${e.message}"
+        }
     }
 
     fun delete(hid: String, id: String) {
@@ -148,7 +169,7 @@ object Repo {
     fun complete(ctx: Context, hid: String, item: Item) {
         item.base = LocalDate.now().toEpochDay()
         item.qty?.let { if (it > 0) item.qty = it - 1 }
-        save(hid, item)
+        save(hid, item, ctx)
         logsRef(hid, item.id).add(mapOf(
             "at" to System.currentTimeMillis(), "by" to nick(ctx), "uid" to (uid() ?: ""),
         ))

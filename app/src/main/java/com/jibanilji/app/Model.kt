@@ -64,6 +64,7 @@ data class Item(
     fun repeatText() = when {
         byDays && days.size == 7 -> "매일"
         byDays -> "매주 " + days.sorted().joinToString("·") { DAY_NAMES[it - 1] }
+        cycle == 1 -> when (unit) { "일" -> "매일"; "주" -> "매주 1회"; "개월" -> "매달 1회"; else -> "매년 1회" }
         else -> "${cycle}${unit}마다"
     }
 

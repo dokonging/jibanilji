@@ -86,7 +86,9 @@ class EditActivity : AppCompatActivity() {
         kind = existing?.kind ?: intent.getStringExtra("kind") ?: FOOD
         val isHome = kind == HOME
 
-        setContentView(R.layout.activity_edit)
+        edgeToEdge()
+        val screenTitle = (if (existing != null) "수정" else "추가") + if (isHome) " · 집안일" else " · 식품"
+        setContentView(screen(screenTitle, layoutInflater.inflate(R.layout.activity_edit, null)))
         photo = findViewById(R.id.photo)
         status = findViewById(R.id.status)
         name = findViewById(R.id.name)
@@ -458,7 +460,7 @@ class EditActivity : AppCompatActivity() {
             assignee = if (kind == HOME) who else ""
             assigneeName = if (kind == HOME) Repo.members[who].orEmpty() else ""
         }
-        Repo.save(hid, item)
+        Repo.save(hid, item, this)
         toast("저장했어요 🔔")
         finish()
     }

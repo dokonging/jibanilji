@@ -16,7 +16,7 @@ object Routines {
         val cycle: Int = 1, val unit: String = "주", val days: List<Int> = emptyList(),
     )
 
-    // days: 1=월 … 7=일
+    // 요일은 정하지 않고 빈도만 추천 (예: 매주 1회 → 1주마다). 요일은 각자 수정에서 지정 가능
     val GROUPS = listOf(
         "청소" to listOf(
             Routine("화장실 청소", "🚽", 1, "주"),
@@ -54,9 +54,9 @@ object Routines {
             Routine("전자레인지 청소", "✨", 1, "개월"),
         ),
         "쓰레기·분리수거" to listOf(
-            Routine("분리수거", "♻️", days = listOf(2)),
+            Routine("분리수거", "♻️", 1, "주"),
             Routine("음식물 쓰레기", "🗑️", 3, "일"),
-            Routine("일반 쓰레기 버리기", "🗑️", days = listOf(1, 4)),
+            Routine("일반 쓰레기 버리기", "🗑️", 3, "일"),
         ),
         "식물·반려동물" to listOf(
             Routine("화분 물주기", "🪴", 1, "주"),
@@ -73,7 +73,7 @@ object Routines {
     )
 
     /** 체크한 루틴을 한 번에 추가 (오늘 시작, 하루 전·당일 오전 9시 알림) */
-    fun showPicker(ctx: Context, hid: String, current: Collection<Item>) {
+    fun showPicker(ctx: Context, hid: String, current: Collection<Item>, onAdded: () -> Unit = {}) {
         val col = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(ctx.dp(20), ctx.dp(8), ctx.dp(20), ctx.dp(8))
@@ -111,7 +111,7 @@ object Routines {
                 val today = LocalDate.now()
                 picked.forEach { r ->
                     val byDays = r.days.isNotEmpty()
-                    Repo.save(hid, Item(
+                    Repo.save(hid, ctx = ctx, item = Item(
                         kind = HOME, name = r.name, icon = r.icon,
                         color = Thumb.colorFor(HOME, r.icon),
                         // 요일 반복은 '어제' 기준으로 두면 오늘부터 해당 요일이 바로 잡힘
@@ -120,6 +120,7 @@ object Routines {
                         repeat = if (byDays) "days" else "interval", days = r.days,
                         hour = 9, minute = 0, offsets = listOf(1, 0), by = Repo.nick(ctx),
                     ))
+                    onAdded()
                 }
                 ctx.toast("${picked.size}개 추가했어요. 눌러서 주기·알림을 바꿀 수 있어요")
             }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#131412</color>
+    <color name="surface">#1D1F1C</color>
+    <color name="surface2">#272A26</color>
+    <color name="line">#2E312D</color>
+    <color name="text">#ECEAE4</color>
+    <color name="muted">#9E9A92</color>
+    <color name="brand">#7CC29E</color>
+    <color name="on_brand">#0F2018</color>
+    <color name="brand_soft">#23362C</color>
+    <color name="danger">#F08A7E</color>
+    <color name="danger_soft">#3A2422</color>
+    <color name="warn">#E9B261</color>
+    <color name="warn_soft">#3A2F1C</color>
+    <color name="photo_bg">#272A26</color>
+    <bool name="light_bars">false</bool>
+</resources>

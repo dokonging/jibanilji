@@ -39,11 +39,6 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".ShareActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
             android:name=".EditActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

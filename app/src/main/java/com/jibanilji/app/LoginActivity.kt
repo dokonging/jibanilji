@@ -60,6 +60,8 @@ class LoginActivity : AppCompatActivity() {
         col.text("처음이면 자동으로 가입돼요", 12f, top = 8, color = R.color.muted)
             .gravity = android.view.Gravity.CENTER
 
+        edgeToEdge()
+        root.applyInsets()
         setContentView(root)
     }
 
