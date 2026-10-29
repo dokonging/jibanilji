@@ -27,28 +27,38 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-/** 알림용 로컬 사본 (사진 제외). 앱이 꺼져 있어도 알림 내용을 만들 수 있게 */
+/** 알림용 로컬 사본 (사진 제외, 집별로 보관). 앱이 꺼져 있어도 알림 내용을 만들 수 있게 */
 object Mirror {
-    fun save(ctx: Context, items: List<Item>) {
+    private fun prefs(ctx: Context) = ctx.getSharedPreferences("mirror", 0)
+
+    fun save(ctx: Context, hid: String, items: List<Item>) {
         val arr = JSONArray()
         items.forEach { arr.put(JSONObject(it.toMap(withPhoto = false)).put("id", it.id)) }
-        ctx.getSharedPreferences("mirror", 0).edit().putString("items", arr.toString()).apply()
+        prefs(ctx).edit().putString("h_$hid", arr.toString()).apply()
     }
 
-    fun all(ctx: Context): List<Item> {
-        val arr = JSONArray(ctx.getSharedPreferences("mirror", 0).getString("items", "[]")!!)
-        return List(arr.length()) { i ->
-            val o = arr.getJSONObject(i)
-            val m = o.keys().asSequence().associateWith { k ->
-                when (val v = o.get(k)) {
-                    is JSONArray -> List(v.length()) { v.get(it) }
-                    JSONObject.NULL -> null
-                    else -> v
+    fun remove(ctx: Context, hid: String) = prefs(ctx).edit().remove("h_$hid").apply()
+    fun clear(ctx: Context) = prefs(ctx).edit().clear().apply()
+
+    /** 모든 집의 항목 (hid 포함) */
+    fun withHouse(ctx: Context): List<Pair<String, Item>> =
+        prefs(ctx).all.filterKeys { it.startsWith("h_") }.flatMap { (k, v) ->
+            val hid = k.removePrefix("h_")
+            val arr = JSONArray(v as? String ?: "[]")
+            List(arr.length()) { i ->
+                val o = arr.getJSONObject(i)
+                val m = o.keys().asSequence().associateWith { key ->
+                    when (val x = o.get(key)) {
+                        is JSONArray -> List(x.length()) { x.get(it) }
+                        JSONObject.NULL -> null
+                        else -> x
+                    }
                 }
+                hid to Item.from(o.getString("id"), m)
             }
-            Item.from(o.getString("id"), m)
         }
-    }
+
+    fun all(ctx: Context): List<Item> = withHouse(ctx).map { it.second }
 }
 
 object Alarms {
@@ -86,7 +96,7 @@ object Alarms {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-    fun notify(ctx: Context, item: Item, d: Int) {
+    fun notify(ctx: Context, item: Item, d: Int, house: String? = null) {
         val nm = ctx.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
             NotificationChannel("expiry", "집안일지 알림", NotificationManager.IMPORTANCE_HIGH)
@@ -114,6 +124,7 @@ object Alarms {
         val n = NotificationCompat.Builder(ctx, "expiry")
             .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setContentTitle("${item.icon} ${item.name}")
+            .setSubText(house)
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(open)
@@ -127,8 +138,9 @@ object Alarms {
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, intent: Intent) {
         val id = intent.getStringExtra("id") ?: return
-        val item = Mirror.all(ctx).firstOrNull { it.id == id } ?: return
-        Alarms.notify(ctx, item, intent.getIntExtra("d", 0))
+        val (hid, item) = Mirror.withHouse(ctx).firstOrNull { it.second.id == id } ?: return
+        val house = if (Repo.houses(ctx).size > 1) Repo.houseName(ctx, hid) else null
+        Alarms.notify(ctx, item, intent.getIntExtra("d", 0), house)
     }
 }
 
@@ -143,13 +155,14 @@ class BootReceiver : BroadcastReceiver() {
 /** 앱을 안 열어도 몇 시간마다 공유 목록을 받아와 알림을 맞춤 */
 class SyncWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
     override fun doWork(): Result {
-        val hid = Repo.cachedHid(applicationContext) ?: return Result.success()
         if (Repo.uid() == null) return Result.success()
+        val ids = Repo.houses(applicationContext).keys.ifEmpty { setOfNotNull(Repo.cachedHid(applicationContext)) }
         return try {
-            val snap = Tasks.await(Repo.itemsRef(hid).get(), 60, TimeUnit.SECONDS)
-            val items = snap.documents.map { Item.from(it.id, it.data ?: emptyMap()) }
-            Mirror.save(applicationContext, items)
-            Alarms.scheduleAll(applicationContext, items)
+            ids.forEach { hid ->
+                val snap = Tasks.await(Repo.itemsRef(hid).get(), 60, TimeUnit.SECONDS)
+                Mirror.save(applicationContext, hid, snap.documents.map { Item.from(it.id, it.data ?: emptyMap()) })
+            }
+            Alarms.scheduleAll(applicationContext, Mirror.all(applicationContext))
             Result.success()
         } catch (e: Exception) {
             Result.retry()

@@ -158,22 +158,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** 다른 집에 참여한 뒤 다시 연결 */
-    fun reconnect() { stopListening(); hid = Repo.cachedHid(this); all = emptyList(); refresh(); listen() }
+    fun reconnect() {
+        stopListening(); hid = Repo.cachedHid(this); all = emptyList()
+        refreshTitles(); refresh(); settings.refreshHouses(); listen()
+    }
 
     private fun listen() {
         val h = hid ?: return
-        if (regHouse == null) regHouse = Repo.listenHousehold(h, ::showError) { data ->
+        if (regHouse == null) regHouse = Repo.listenHousehold(this, h, ::showError) { data ->
             settings.update(data)
-            Alarms.scheduleAll(this, all) // 담당자 정보가 바뀌었을 수 있음
+            refreshTitles()
+            Alarms.scheduleAll(this, Mirror.all(this)) // 담당자 정보가 바뀌었을 수 있음
         }
         if (reg == null) reg = Repo.listen(h, ::showError) { items ->
             all = items
             Repo.lastError = null
             banner.visibility = View.GONE
-            Mirror.save(this, items)
-            Alarms.scheduleAll(this, items)
+            Mirror.save(this, h, items)
+            Alarms.scheduleAll(this, Mirror.all(this))
             refresh()
         }
+        Repo.syncOtherHouses(this)
+    }
+
+    /** 각 페이지 상단에 지금 보는 집 이름 표시 (집이 여러 개일 때 누르면 전환) */
+    private fun refreshTitles() {
+        val name = Repo.houseName(this, hid ?: return)
+        val multi = Repo.houses(this).size > 1
+        listOf(calendar, food, home).forEach { it.setHouse(name, multi) }
+    }
+
+    /** 집 전환 */
+    fun pickHouse() {
+        val hs = Repo.houses(this).entries.toList()
+        if (hs.size < 2) { select(3); return toast("설정에서 새 집을 만들거나 다른 집에 참여할 수 있어요") }
+        AlertDialog.Builder(this).setTitle("어느 집을 볼까요?")
+            .setItems(hs.map { (id, n) -> (if (id == hid) "✓ " else "    ") + n }.toTypedArray()) { _, w ->
+                switchHouse(hs[w].key)
+            }.show()
+    }
+
+    fun switchHouse(id: String) {
+        if (id == hid) return
+        Repo.switchTo(this, id)
+        reconnect()
+        toast("'${Repo.houseName(this, id)}'(으)로 바꿨어요")
     }
 
     private fun showError(msg: String) {
@@ -216,14 +245,14 @@ class MainActivity : AppCompatActivity() {
             2 -> open(HOME)
             else -> AlertDialog.Builder(this).setTitle("무엇을 추가할까요?")
                 .setItems(arrayOf("🧊 식품", "🧹 집안일", "⭐ 추천 집안일 루틴")) { _, w ->
-                    when (w) { 0 -> open(FOOD); 1 -> open(HOME); else -> Routines.showPicker(this, h, all) }
+                    when (w) { 0 -> open(FOOD); 1 -> open(HOME); else -> showRoutines() }
                 }.show()
         }
     }
 
     fun showRoutines() {
-        val h = hid ?: return toast("아직 집 정보를 불러오는 중이에요")
-        Routines.showPicker(this, h, all)
+        if (hid == null) return toast("아직 집 정보를 불러오는 중이에요")
+        startActivity(Intent(this, RoutinesActivity::class.java))
     }
 
     fun openEdit(item: Item) =

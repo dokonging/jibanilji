@@ -92,9 +92,22 @@ abstract class ListPageBase(protected val main: MainActivity, title: String) : F
         setPadding(main.dp(24), main.dp(40), main.dp(24), main.dp(40)); setLineSpacing(0f, 1.3f)
     }
 
+    private val houseChip = TextView(main).apply {
+        textSize = 13f; setTextColor(main.c(R.color.brand)); visibility = View.GONE
+        background = main.rounded(main.c(R.color.brand_soft), 14)
+        setPadding(main.dp(12), main.dp(6), main.dp(12), main.dp(6))
+        setOnClickListener { main.pickHouse() }
+    }
+
+    fun setHouse(name: String, multi: Boolean) {
+        houseChip.text = "🏠 $name" + if (multi) "  ▾" else ""
+        houseChip.visibility = View.VISIBLE
+    }
+
     init {
         val (h, sub) = main.pageHeader(title)
         subtitle = sub
+        h.addView(houseChip, 0, LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = main.dp(8) })
         headerBox.addView(h)
         list.addHeaderView(headerBox, null, false)
         list.addFooterView(empty, null, false)
@@ -203,8 +216,9 @@ class KindPage(main: MainActivity, val kind: String) :
     }
 }
 
-/** ⚙️ 설정: 함께 쓰기 · 계정 · 앱 정보 */
+/** ⚙️ 설정: 내 집들 · 함께 쓰기 · 화면 · 계정 · 앱 정보 */
 class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
+    private val houseList: LinearLayout
     private val houseName: TextView
     private val members: TextView
     private val codeView: TextView
@@ -218,23 +232,32 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
         }
         val (h, sub) = main.pageHeader("설정")
         h.setPadding(main.dp(4), h.paddingTop, main.dp(4), h.paddingBottom)
-        sub.text = "함께 쓰기와 계정"
+        sub.text = "집 관리 · 함께 쓰기 · 화면 · 계정"
         col.addView(h)
 
-        // 우리 집
-        val house = col.card(8)
-        houseName = house.text("불러오는 중…", 19f, bold = true)
+        // 내 집들
+        val houses = col.card(8)
+        houses.text("내 집", 16f, bold = true)
+        houses.text("혼자 쓰는 집과 가족·친구와 공유하는 집을 따로 만들 수 있어요", 12f, top = 2, color = R.color.muted)
+        houseList = LinearLayout(main).apply { orientation = LinearLayout.VERTICAL }
+        houses.addView(houseList)
+        houses.addView(textButton("＋ 새 집 만들기") { createHouse() })
+
+        // 지금 보는 집 (공유)
+        val house = col.card()
+        houseName = house.text("불러오는 중…", 18f, bold = true)
         members = house.text("", 13f, top = 4, color = R.color.muted)
-        house.text("초대 코드", 12f, top = 16, color = R.color.muted)
+        house.text("이 집의 초대 코드", 12f, top = 16, color = R.color.muted)
         codeView = house.text("······", 30f, bold = true, color = R.color.brand)
-        house.text("가족·친구가 이 코드를 입력하면 같은 목록과 알림을 함께 써요", 12f, top = 2, color = R.color.muted)
+        house.text("이 코드를 받은 사람만 이 집을 함께 써요. 내 다른 집은 공유되지 않아요", 12f, top = 2, color = R.color.muted)
         house.button("📤  초대 메시지 보내기", top = 14) {
             if (code.isEmpty()) return@button
             if (!Premium.unlocked()) return@button Premium.upsell(main, "같이 쓰기는 프리미엄 기능이에요.")
             main.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT,
-                    "집안일지 같이 써요! 🏠\n앱의 [설정 > 다른 집에 참여하기]에 아래 코드를 입력해 주세요\n\n$code")
+                    "집안일지 '${houseName.text.removePrefix("🏠 ")}' 같이 써요! 🏠\n" +
+                        "앱의 [설정 > 다른 집에 참여하기]에 아래 코드를 입력해 주세요\n\n$code")
             }, "초대하기"))
         }
         val row = LinearLayout(main).also { house.addView(it) }
@@ -244,12 +267,13 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
                 .setPrimaryClip(ClipData.newPlainText("초대 코드", code))
             main.toast("복사했어요")
         }, LinearLayout.LayoutParams(0, -2, 1f))
-        row.addView(textButton("집 이름 바꾸기") { rename() }, LinearLayout.LayoutParams(0, -2, 1f))
+        row.addView(textButton("이름 바꾸기") { rename() }, LinearLayout.LayoutParams(0, -2, 1f))
+        row.addView(textButton("나가기", R.color.danger) { leaveCurrent() }, LinearLayout.LayoutParams(0, -2, 1f))
 
         // 다른 집 참여
         val join = col.card()
         join.text("다른 집에 참여하기", 16f, bold = true)
-        join.text("받은 초대 코드를 입력하면 그 집으로 옮겨가요", 12f, top = 2, color = R.color.muted)
+        join.text("받은 초대 코드를 입력하면 내 집 목록에 추가돼요", 12f, top = 2, color = R.color.muted)
         val input = join.input("초대 코드 6자리", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS)
         val msg = join.text("", 13f, top = 4, color = R.color.danger)
         join.button("참여하기", top = 6) {
@@ -259,6 +283,26 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
                 if (ok) { main.toast(m); msg.text = ""; input.setText(""); main.reconnect() } else msg.text = m
             }
         }
+
+        // 집안일 추천 루틴
+        val rt = col.card()
+        rt.text("추천 루틴 관리", 16f, bold = true)
+        rt.text("추천 목록을 내 생활에 맞게 고치거나 새로 만들어요", 12f, top = 2, color = R.color.muted)
+        rt.addView(textButton("추천 루틴 편집하기  ›") { main.showRoutines() })
+
+        // 화면 모드
+        val theme = col.card()
+        theme.text("화면 모드", 16f, bold = true)
+        val modes = listOf(App.MODE_SYSTEM to "시스템 설정", App.MODE_LIGHT to "☀️ 라이트", App.MODE_DARK to "🌙 다크")
+        val g = ChipGroup(main).apply { isSingleSelection = true; isSelectionRequired = true }
+        val cur = App.mode(main)
+        modes.forEach { (m, label) ->
+            g.addView(Chip(main).apply {
+                text = label; isCheckable = true; isChecked = m == cur
+                setOnClickListener { App.setMode(main, m) }
+            })
+        }
+        theme.addView(g)
 
         // 계정
         val acc = col.card()
@@ -277,6 +321,7 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
         })
 
         addView(ScrollView(main).apply { addView(col) })
+        refreshHouses()
     }
 
     private fun textButton(s: String, color: Int = R.color.brand, onClick: () -> Unit) =
@@ -284,17 +329,50 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
             text = s; setTextColor(main.c(color)); setOnClickListener { onClick() }
         }
 
+    /** 내 집 목록 다시 그리기 (누르면 전환) */
+    fun refreshHouses() {
+        houseList.removeAllViews()
+        val cur = Repo.cachedHid(main)
+        Repo.houses(main).forEach { (id, name) ->
+            val on = id == cur
+            houseList.addView(TextView(main).apply {
+                text = (if (on) "✓  " else "     ") + name + if (on) "  (지금 보는 집)" else ""
+                textSize = 15f; setTextColor(main.c(if (on) R.color.brand else R.color.text))
+                if (on) setTypeface(typeface, Typeface.BOLD)
+                setPadding(main.dp(12), main.dp(12), main.dp(12), main.dp(12))
+                background = main.rounded(main.c(if (on) R.color.brand_soft else R.color.surface2), 14)
+                layoutParams = LinearLayout.LayoutParams(-1, -2).apply { topMargin = main.dp(8) }
+                setOnClickListener { main.switchHouse(id) }
+            })
+        }
+    }
+
     fun update(h: Map<String, Any?>) {
         houseName.text = "🏠 " + (h["name"] as? String ?: "우리 집")
         code = h["code"] as? String ?: ""
         codeView.text = code.ifEmpty { "······" }
         val names = Repo.members.values.toList()
-        members.text = "함께 쓰는 사람 ${names.size}명 · ${names.joinToString(", ")}"
+        members.text = if (names.size <= 1) "나 혼자 쓰는 집이에요"
+            else "함께 쓰는 사람 ${names.size}명 · ${names.joinToString(", ")}"
+        refreshHouses()
     }
 
     fun refreshStatus() {
         status.text = "동기화: " + (Repo.lastError?.let { "⚠️ $it" } ?: "정상 ✓") +
-            "\n등록된 항목: 식품 ${main.all.count { it.kind == FOOD }}개 · 집안일 ${main.all.count { it.kind == HOME }}개"
+            "\n지금 보는 집: 식품 ${main.all.count { it.kind == FOOD }}개 · 집안일 ${main.all.count { it.kind == HOME }}개"
+    }
+
+    private fun createHouse() {
+        val et = EditText(main).apply { hint = "예: 우리 집, 자취방, 본가" }
+        AlertDialog.Builder(main).setTitle("새 집 만들기").setView(FrameLayout(main).apply {
+            setPadding(main.dp(20), main.dp(8), main.dp(20), 0); addView(et)
+        }).setPositiveButton("만들기") { _, _ ->
+            val n = et.text.toString().trim().ifEmpty { "새 집" }
+            Repo.createHousehold(main, n) { hid, e ->
+                if (hid != null) { main.toast("'$n'을(를) 만들었어요"); main.reconnect() }
+                else main.toast("만들지 못했어요: $e")
+            }
+        }.setNegativeButton("취소", null).show()
     }
 
     private fun rename() {
@@ -304,8 +382,22 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
             setPadding(main.dp(20), main.dp(8), main.dp(20), 0); addView(et)
         }).setPositiveButton("저장") { _, _ ->
             val n = et.text.toString().trim()
-            if (n.isNotEmpty()) Repo.renameHousehold(hid, n)
+            if (n.isNotEmpty()) { Repo.renameHousehold(main, hid, n); refreshHouses() }
         }.setNegativeButton("취소", null).show()
+    }
+
+    private fun leaveCurrent() {
+        val hid = Repo.cachedHid(main) ?: return
+        val alone = Repo.members.size <= 1
+        AlertDialog.Builder(main).setTitle("이 집에서 나갈까요?")
+            .setMessage(if (alone) "혼자 쓰는 집이라 나가면 이 집의 모든 목록과 기록이 지워져요." 
+                else "다른 사람들은 계속 이 집을 쓸 수 있어요. 다시 들어오려면 초대 코드가 필요해요.")
+            .setPositiveButton("나가기") { _, _ ->
+                Repo.leaveHouse(main, hid) { ok, m ->
+                    main.toast(m)
+                    if (ok) main.reconnect()
+                }
+            }.setNegativeButton("취소", null).show()
     }
 
     private fun logout() {
@@ -316,7 +408,7 @@ class SettingsPage(private val main: MainActivity) : FrameLayout(main) {
 
     private fun deleteAccount() {
         AlertDialog.Builder(main).setTitle("계정을 삭제할까요?")
-            .setMessage("계정과 내 정보가 지워져요. 혼자 쓰던 집이면 모든 목록과 기록도 함께 지워지고, 되돌릴 수 없어요.")
+            .setMessage("계정과 내 정보가 지워져요. 혼자 쓰던 집은 모든 목록과 기록도 함께 지워지고, 되돌릴 수 없어요.")
             .setPositiveButton("삭제") { _, _ ->
                 Repo.deleteAccount(main) { ok, m ->
                     main.toast(m)
