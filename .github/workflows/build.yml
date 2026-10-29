@@ -36,7 +36,14 @@ jobs:
           fi
 
       - name: Build APK
-        run: gradle assembleRelease --no-daemon
+        run: |
+          set -o pipefail
+          if ! gradle assembleRelease --no-daemon --console=plain 2>&1 | tee build.log; then
+            # 오류 줄만 모아서 Actions 화면 요약에 표시
+            msg=$(grep -E "^e: |^w: .*error|What went wrong|^> |error:|Exception|not found|Could not" build.log | head -60 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Build failed::${msg}"
+            exit 1
+          fi
 
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk 집안일지.apk
