@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "975625266067",
+    "project_id": "jibanilji",
+    "storage_bucket": "jibanilji.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975625266067:android:15e81586952bebe6b3fe66",
+        "android_client_info": {
+          "package_name": "com.jibanilji.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975625266067-ll0a9rr8dj821g73f9bclegm0jtlaiep.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jibanilji.app",
+            "certificate_hash": "78aa6c9a8536853270487d60a3c8d70286eb741d"
+          }
+        },
+        {
+          "client_id": "975625266067-u7q1pqddsfaafges0jnmthmt49q59uql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7vlc7EpAtdoZNeANTDR3P9OszXxp_USM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975625266067-u7q1pqddsfaafges0jnmthmt49q59uql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
