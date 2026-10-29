@@ -17,7 +17,7 @@ import java.time.LocalDate
  *   users/{uid}                         { household, name }
  *   households/{hid}                    { name, code, members[], names{uid:닉네임}, owner, premium }
  *   households/{hid}/items/{id}         식품 · 집안일
- *   households/{hid}/items/{id}/logs/*  완료 기록 { at, by, uid }
+ *   households/{hid}/items/{id}/logs/{logId} 완료 기록 { at, by, uid }
  *   invites/{code}                      { hid }
  */
 object Repo {

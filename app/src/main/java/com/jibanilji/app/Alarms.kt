@@ -104,7 +104,7 @@ object Alarms {
         } else when (d) {
             0 -> "오늘($date)까지예요! 얼른 드세요 🍽️"
             1 -> "내일($date)까지예요"
-            else -> "${d}일 남았어요 ($date까지)"
+            else -> "${d}일 남았어요 (${date}까지)"
         }
         if (item.kind == HOME && item.qty == 0) text += "\n⚠️ 재고가 없어요. 미리 사두세요"
 
